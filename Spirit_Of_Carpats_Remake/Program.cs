@@ -9,7 +9,8 @@ class Program
 {
     static void Main(string[] args)
     {
-        const int screenWidth = 1376;
+        AutoInsertReaurses.Sync();
+        const int screenWidth = 1377;
         const int screenHeight = 768;
 
         InitWindow(screenWidth, screenHeight, "Дух Карпат: Забута Варта");

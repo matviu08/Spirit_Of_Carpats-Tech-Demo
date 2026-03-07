@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Spirit_Of_Carpats_Remake.Interfaces
 {
-    internal interface IMenu
+    public interface IMenu
     {
+        void Update();
+        void Draw();
     }
 }

@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Services\" />
+    <Folder Include="Resurses\Img\" />
+    <Folder Include="Resurses\Font\" />
   </ItemGroup>
 
   <ItemGroup>

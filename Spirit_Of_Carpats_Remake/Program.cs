@@ -18,7 +18,9 @@ class Program
         SetTargetFPS(60);
 
         Texture2D backgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
-
+        Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
+        PlayMusicStream(ambientMusic);
+        SetMusicVolume(ambientMusic, 1f);
         IMenu mainMenu = new MenuService();
 
         while (!WindowShouldClose())
@@ -28,6 +30,7 @@ class Program
             BeginDrawing();
             ClearBackground(Color.Black);
 
+            UpdateMusicStream(ambientMusic);
             DrawTexture(backgroundTexture, 0, 0, Color.White);
 
             mainMenu.Draw();
@@ -35,6 +38,7 @@ class Program
             EndDrawing();
         }
 
+        UnloadMusicStream(ambientMusic);
         UnloadTexture(backgroundTexture);
         CloseAudioDevice();
         CloseWindow();

@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Resurses\Img\" />
-    <Folder Include="Resurses\Font\" />
-    <Folder Include="Resurses\Music\" />
+    <Compile Remove="Resurses\**" />
+    <EmbeddedResource Remove="Resurses\**" />
+    <None Remove="Resurses\**" />
   </ItemGroup>
 
   <ItemGroup>

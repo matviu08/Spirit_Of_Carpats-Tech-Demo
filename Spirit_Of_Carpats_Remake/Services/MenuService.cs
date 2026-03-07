@@ -14,9 +14,11 @@ namespace Spirit_Of_Carpats_Remake.Services
     public class MenuService : IMenu
     {
         private MenuScreen _currentScreen = MenuScreen.Main;
+        private Dictionary<string, bool> _buttonHoverStates = new();
         private GameSettings _settings = new();
         private bool _waitingForKey = false;
         private string _activeBinding = "";
+        Sound hover = LoadSound(".\\Resurses\\Music\\hover_sound.wav");
         public void Update()
         {
             Vector2 mousePos = GetMousePosition();
@@ -73,9 +75,25 @@ namespace Spirit_Of_Carpats_Remake.Services
             float yPos = (screenHeight * 0.41f) + yOffset;
 
             Vector2 pos = new Vector2(xPos, yPos);
+            Rectangle buttonRect = new Rectangle(pos.X, pos.Y, textWidth, fontSize);
 
-            bool isHovered = CheckCollisionPointRec(GetMousePosition(),
-                new Rectangle(pos.X, pos.Y, textWidth, fontSize));
+            bool isHovered = CheckCollisionPointRec(GetMousePosition(), buttonRect);
+
+            // Ініціалізуємо стан у словнику, якщо цієї кнопки там ще немає
+            if (!_buttonHoverStates.ContainsKey(text))
+            {
+                _buttonHoverStates[text] = false;
+            }
+
+            // ГОЛОВНА ЛОГІКА: якщо зараз наведено, а в минулому кадрі — ні
+            if (isHovered && !_buttonHoverStates[text])
+            {
+                // Перевіряємо, чи звук завантажений, і граємо
+                PlaySound(hover);
+            }
+
+            // Оновлюємо стан у словнику для наступного кадру
+            _buttonHoverStates[text] = isHovered;
 
             DrawText(text, (int)pos.X, (int)pos.Y, fontSize, isHovered ? Color.Gold : Color.Beige);
         }

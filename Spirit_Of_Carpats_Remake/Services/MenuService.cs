@@ -26,7 +26,6 @@ namespace Spirit_Of_Carpats_Remake.Services
             if (_currentScreen == MenuScreen.Main)
             {
                 if (IsButtonClicked("New Game", 0)) _currentScreen = MenuScreen.Chapters;
-                //if (IsButtonClicked("Settings", 100)) _currentScreen = MenuScreen.Settings;
                 if (IsButtonClicked("Quit", 200)) CloseWindow();
             }
             //else if (_currentScreen == MenuScreen.Settings)
@@ -79,20 +78,16 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             bool isHovered = CheckCollisionPointRec(GetMousePosition(), buttonRect);
 
-            // Ініціалізуємо стан у словнику, якщо цієї кнопки там ще немає
             if (!_buttonHoverStates.ContainsKey(text))
             {
                 _buttonHoverStates[text] = false;
             }
 
-            // ГОЛОВНА ЛОГІКА: якщо зараз наведено, а в минулому кадрі — ні
             if (isHovered && !_buttonHoverStates[text])
             {
-                // Перевіряємо, чи звук завантажений, і граємо
                 PlaySound(hover);
             }
 
-            // Оновлюємо стан у словнику для наступного кадру
             _buttonHoverStates[text] = isHovered;
 
             DrawText(text, (int)pos.X, (int)pos.Y, fontSize, isHovered ? Color.Gold : Color.Beige);

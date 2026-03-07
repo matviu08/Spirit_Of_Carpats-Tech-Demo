@@ -12,7 +12,7 @@ class Program
         const int screenWidth = 1376;
         const int screenHeight = 768;
 
-        InitWindow(screenWidth, screenHeight, "Шепіт Карпат: Забута Варта");
+        InitWindow(screenWidth, screenHeight, "Дух Карпат: Забута Варта");
         InitAudioDevice(); 
 
         SetTargetFPS(60);

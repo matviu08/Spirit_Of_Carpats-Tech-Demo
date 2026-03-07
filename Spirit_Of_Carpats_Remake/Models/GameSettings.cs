@@ -7,7 +7,15 @@ using System.Threading.Tasks;
 
 namespace Spirit_Of_Carpats_Remake.Models
 {
-    public enum MenuScreen { Main, Chapters, Settings, Binds }
+    public enum GameState
+    {
+        MainMenu,
+        Settings,
+        Closing,
+        Chapters,
+        InGame 
+    }
+
     public class GameSettings
     {
         public bool IsEnglish = true;

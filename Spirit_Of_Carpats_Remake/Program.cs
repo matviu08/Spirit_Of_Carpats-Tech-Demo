@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using Spirit_Of_Carpats_Remake.Interfaces;
+using Spirit_Of_Carpats_Remake.Models;
 using Spirit_Of_Carpats_Remake.Services;
 using static Raylib_cs.Raylib;
 
@@ -7,6 +8,7 @@ namespace ForestGame;
 
 class Program
 {
+    static GameState currentState = GameState.MainMenu;
     static void Main(string[] args)
     {
         AutoInsertReaurses.Sync();
@@ -14,33 +16,54 @@ class Program
         const int screenHeight = 768;
 
         InitWindow(screenWidth, screenHeight, "Дух Карпат: Забута Варта");
-        InitAudioDevice(); 
+        InitAudioDevice();
 
         SetTargetFPS(60);
 
-        Texture2D backgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
+        Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
+        Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.png");
         Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
         PlayMusicStream(ambientMusic);
         SetMusicVolume(ambientMusic, 1f);
         IMenu mainMenu = new MenuService();
 
-        while (!WindowShouldClose())
+        try
         {
-            mainMenu.Update();
+            while (!WindowShouldClose())
+            {
+                mainMenu.Update(ref currentState);
 
-            BeginDrawing();
-            ClearBackground(Color.Black);
+                BeginDrawing();
+                ClearBackground(Color.Black);
 
-            UpdateMusicStream(ambientMusic);
-            DrawTexture(backgroundTexture, 0, 0, Color.White);
+                UpdateMusicStream(ambientMusic);
+                if (currentState == GameState.MainMenu)
+                {
+                    DrawTexture(menuBackgroundTexture, 0, 0, Color.White);
+                }
+                else if (currentState == GameState.Settings)
+                {
+                    DrawTexture(optionBackgroundTexture, 0, 0, Color.White);
+                }
+                else if (currentState == GameState.Closing)
+                {
+                    CloseWindow();
+                }
 
-            mainMenu.Draw();
 
-            EndDrawing();
+                mainMenu.Draw(currentState);
+
+                EndDrawing();
+            }
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
         }
 
+        UnloadTexture(menuBackgroundTexture);
+        UnloadTexture(optionBackgroundTexture);
         UnloadMusicStream(ambientMusic);
-        UnloadTexture(backgroundTexture);
         CloseAudioDevice();
         CloseWindow();
     }

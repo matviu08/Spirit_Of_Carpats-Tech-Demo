@@ -13,51 +13,37 @@ namespace Spirit_Of_Carpats_Remake.Services
 {
     public class MenuService : IMenu
     {
-        private MenuScreen _currentScreen = MenuScreen.Main;
         private Dictionary<string, bool> _buttonHoverStates = new();
-        private GameSettings _settings = new();
         private bool _waitingForKey = false;
-        private string _activeBinding = "";
         Sound hover = LoadSound(".\\Resurses\\Music\\hover_sound.wav");
-        public void Update()
+        public void Update(ref GameState state)
         {
             Vector2 mousePos = GetMousePosition();
 
-            if (_currentScreen == MenuScreen.Main)
+            if (state == GameState.MainMenu)
             {
-                if (IsButtonClicked("New Game", 0)) _currentScreen = MenuScreen.Chapters;
-                if (IsButtonClicked("Quit", 200)) CloseWindow();
+                if (IsButtonClicked("New Game", 0)) state = GameState.Chapters;
+                if (IsButtonClicked("Options", 120)) state = GameState.Settings; 
+                if (IsButtonClicked("Exit", 180)) state = GameState.Closing;
             }
-            //else if (_currentScreen == MenuScreen.Settings)
-            //{
-            //    if (IsButtonClicked(_settings.IsEnglish ? "Language: EN" : "Мова: УА", 0))
-            //        _settings.IsEnglish = !_settings.IsEnglish;
-
-            //    if (IsButtonClicked("Binds", 100)) _currentScreen = MenuScreen.Binds;
-            //    if (IsButtonClicked("Back", 250)) _currentScreen = MenuScreen.Main;
-            //}
-            //else if (_currentScreen == MenuScreen.Binds)
-            //{
-            //    HandleBindingUpdate();
-            //    if (IsButtonClicked("Back", 300)) _currentScreen = MenuScreen.Settings;
-            //}
+            else if (state == GameState.Settings)
+            {
+                if (IsButtonClicked("Back", 250)) state = GameState.MainMenu;
+            }
         }
 
-        public void Draw()
+        public void Draw(GameState state)
         {
-            ClearBackground(Color.Black);
-
-            if (_currentScreen == MenuScreen.Main)
+            if (state == GameState.MainMenu)
             {
                 DrawMenuButton("New Game", 0);
                 DrawMenuButton("Load Game", 60);
                 DrawMenuButton("Options", 120);
                 DrawMenuButton("Exit", 180);
             }
-            else if (_currentScreen == MenuScreen.Settings)
+            else if (state == GameState.Settings)
             {
-                DrawMenuButton(_settings.IsEnglish ? "Language: English" : "Мова: Українська", 0);
-                DrawMenuButton("Binds", 100);
+                DrawMenuButton("Volume", 0);
                 DrawMenuButton("Back", 250);
             }
         }
@@ -95,14 +81,14 @@ namespace Spirit_Of_Carpats_Remake.Services
 
         private bool IsButtonClicked(string text, float yOffset)
         {
-            int fontSize = 30; // Має збігатися з Draw
+            int fontSize = 30; 
             int textWidth = MeasureText(text, fontSize);
             int screenWidth = GetScreenWidth();
             int screenHeight = GetScreenHeight();
 
             float panelWidth = 340;
             float xPos = (screenWidth - panelWidth) + (panelWidth / 2) - (textWidth / 2);
-            float yPos = (screenHeight * 0.55f) + yOffset;
+            float yPos = (screenHeight * 0.41f) + yOffset;
 
             Rectangle rect = new Rectangle(xPos, yPos, textWidth, fontSize);
             return CheckCollisionPointRec(GetMousePosition(), rect) && IsMouseButtonPressed(MouseButton.Left);

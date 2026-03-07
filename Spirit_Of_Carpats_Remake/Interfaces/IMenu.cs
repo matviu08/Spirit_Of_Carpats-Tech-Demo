@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spirit_Of_Carpats_Remake.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Spirit_Of_Carpats_Remake.Interfaces
 {
     public interface IMenu
     {
-        void Update();
-        void Draw();
+        void Update(ref GameState state);
+        void Draw(GameState state);
     }
 }

@@ -17,7 +17,7 @@ class Program
 
         SetTargetFPS(60);
 
-        Texture2D backgroundTexture = LoadTexture("C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake\\Resurses\\Img\\meinMenuBac.png");
+        Texture2D backgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
 
         IMenu mainMenu = new MenuService();
 

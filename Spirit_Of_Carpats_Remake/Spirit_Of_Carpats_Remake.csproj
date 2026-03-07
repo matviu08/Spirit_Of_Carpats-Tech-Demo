@@ -10,6 +10,7 @@
   <ItemGroup>
     <Folder Include="Resurses\Img\" />
     <Folder Include="Resurses\Font\" />
+    <Folder Include="Resurses\Music\" />
   </ItemGroup>
 
   <ItemGroup>

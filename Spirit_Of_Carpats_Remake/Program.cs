@@ -12,12 +12,12 @@ class Program
         const int screenWidth = 1376;
         const int screenHeight = 768;
 
-        InitWindow(screenWidth, screenHeight, "Шепіт Карпат: Забута Варта");
+        InitWindow(screenWidth, screenHeight, "Дух Карпат: Забута Варта");
         InitAudioDevice(); 
 
         SetTargetFPS(60);
 
-        Texture2D backgroundTexture = LoadTexture("C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake\\Resurses\\Img\\meinMenuBac.png");
+        Texture2D backgroundTexture = LoadTexture("Resurses\\Img\\meinMenuBac.png");
 
         IMenu mainMenu = new MenuService();
 

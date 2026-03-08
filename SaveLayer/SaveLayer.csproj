@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Spirit_Of_Carpats_Remake\Spirit_Of_Carpats_Remake.csproj" />
+  </ItemGroup>
+
 </Project>

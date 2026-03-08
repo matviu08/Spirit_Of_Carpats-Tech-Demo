@@ -26,11 +26,11 @@ class Program
 
         Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
         Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.png");
-        Texture2D locationBackGround  = LoadTexture(".\\Resurses\\Img\\WoodBackground.png");
         Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
         PlayMusicStream(ambientMusic);
         SetMusicVolume(ambientMusic, 1f);
         IMenu mainMenu = new MenuService();
+        LocationService locationService = new LocationService();
 
         try
         {
@@ -41,20 +41,17 @@ class Program
                 if (!isTransitioning)
                 {
                     GameState oldState = currentState;
-                    mainMenu.Update(ref currentState);
+
+                    if (currentState == GameState.MainMenu || currentState == GameState.Settings)
+                        mainMenu.Update(ref currentState);
+                    else if (currentState == GameState.Chapters || currentState == GameState.InGame)
+                        locationService.Update(ref currentState);
 
                     if (currentState != oldState)
                     {
-                        if (currentState == GameState.Closing)
-                        {
-                            isTransitioning = true;
-                        }
-                        else
-                        {
-                            targetState = currentState;
-                            currentState = oldState; 
-                            isTransitioning = true;   
-                        }
+                        targetState = currentState;
+                        currentState = oldState;
+                        isTransitioning = true;
                     }
                 }
 
@@ -63,16 +60,12 @@ class Program
                 BeginDrawing();
                 ClearBackground(Color.Black);
 
-                if (currentState == GameState.MainMenu)
-                {
-                    DrawTexture(menuBackgroundTexture, 0, 0, Color.White);
-                }
-                else if (currentState == GameState.Settings)
-                {
-                    DrawTexture(optionBackgroundTexture, 0, 0, Color.White);
-                }
+                DrawBackground(menuBackgroundTexture, optionBackgroundTexture);
 
+                if (currentState == GameState.MainMenu || currentState == GameState.Settings)
                     mainMenu.Draw(currentState);
+                else if (currentState == GameState.Chapters || currentState == GameState.InGame)
+                    locationService.Draw(currentState);
 
                 if (fadeAlpha > 0)
                 {
@@ -89,7 +82,8 @@ class Program
 
         UnloadTexture(menuBackgroundTexture);
         UnloadTexture(optionBackgroundTexture);
-        UnloadMusicStream(ambientMusic);
+        UnloadMusicStream(ambientMusic); 
+        locationService.Unload();
         CloseAudioDevice();
         CloseWindow();
     }
@@ -115,5 +109,13 @@ class Program
             fadeAlpha -= 5f;
             if (fadeAlpha < 0) fadeAlpha = 0;
         }
+    }
+
+    static void DrawBackground(Texture2D menu, Texture2D options)
+    {
+        if (currentState == GameState.MainMenu)
+            DrawTexture(menu, 0, 0, Color.White);
+        else if (currentState == GameState.Settings)
+            DrawTexture(options, 0, 0, Color.White);
     }
 }

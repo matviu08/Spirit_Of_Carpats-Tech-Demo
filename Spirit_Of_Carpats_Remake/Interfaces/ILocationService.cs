@@ -10,6 +10,7 @@ namespace Spirit_Of_Carpats_Remake.Interfaces
     public interface ILocationService
     {
         void Update(ref GameState state);
-           void Draw(GameState state);
+        void Draw(GameState state);
+        void Unload();
     }
 }

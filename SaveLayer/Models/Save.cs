@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Spirit_Of_Carpats_Remake.Models;
 namespace BLL.Models
 {
+    [Serializable]
     public class Save
     {
         public int PlayerHp { get; set; }

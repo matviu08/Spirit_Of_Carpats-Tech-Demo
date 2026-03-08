@@ -2,6 +2,7 @@
 using Spirit_Of_Carpats_Remake.Interfaces;
 using Spirit_Of_Carpats_Remake.Models;
 using Spirit_Of_Carpats_Remake.Services;
+using System.Numerics;
 using static Raylib_cs.Raylib;
 
 namespace ForestGame;
@@ -43,7 +44,7 @@ class Program
                     GameState oldState = currentState;
 
                     if (currentState == GameState.MainMenu || currentState == GameState.Settings)
-                        mainMenu.Update(ref currentState);
+                        mainMenu.Update(ref currentState, ambientMusic);
                     else if (currentState == GameState.Chapters || currentState == GameState.InGame)
                         locationService.Update(ref currentState);
 
@@ -69,7 +70,7 @@ class Program
 
                 if (fadeAlpha > 0)
                 {
-                    DrawRectangle(0, 0, screenWidth, screenHeight, Fade(Color.Black, fadeAlpha / 255f));
+                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(Color.Black, fadeAlpha / 255f));
                 }
 
                 EndDrawing();
@@ -113,9 +114,19 @@ class Program
 
     static void DrawBackground(Texture2D menu, Texture2D options)
     {
+        int width = GetScreenWidth();
+        int height = GetScreenHeight();
+
+        Texture2D textureToDraw;
         if (currentState == GameState.MainMenu)
-            DrawTexture(menu, 0, 0, Color.White);
+            textureToDraw = menu;
         else if (currentState == GameState.Settings)
-            DrawTexture(options, 0, 0, Color.White);
+            textureToDraw = options;
+        else
+            return; 
+
+        Rectangle source = new Rectangle(0, 0, textureToDraw.Width, textureToDraw.Height);
+        Rectangle dest = new Rectangle(0, 0, width, height);
+        DrawTexturePro(textureToDraw, source, dest, new Vector2(0, 0), 0.0f, Color.White);
     }
 }

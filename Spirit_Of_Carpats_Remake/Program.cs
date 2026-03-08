@@ -10,7 +10,8 @@ namespace ForestGame;
 class Program
 {
     static GameState currentState = GameState.MainMenu;
-    static GameState targetState = GameState.MainMenu;
+    static GameState targetState = GameState.MainMenu; 
+    static GameSettings settings = new GameSettings();
     static float fadeAlpha = 0f;
     static bool isTransitioning = false;
     static bool isClosing = false;
@@ -44,7 +45,7 @@ class Program
                     GameState oldState = currentState;
 
                     if (currentState == GameState.MainMenu || currentState == GameState.Settings)
-                        mainMenu.Update(ref currentState, ambientMusic);
+                        mainMenu.Update(ref currentState, settings, ambientMusic);
                     else if (currentState == GameState.Chapters || currentState == GameState.InGame)
                         locationService.Update(ref currentState);
 
@@ -64,7 +65,7 @@ class Program
                 DrawBackground(menuBackgroundTexture, optionBackgroundTexture);
 
                 if (currentState == GameState.MainMenu || currentState == GameState.Settings)
-                    mainMenu.Draw(currentState);
+                    mainMenu.Draw(currentState, settings);
                 else if (currentState == GameState.Chapters || currentState == GameState.InGame)
                     locationService.Draw(currentState);
 

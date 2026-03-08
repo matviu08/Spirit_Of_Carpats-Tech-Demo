@@ -10,7 +10,7 @@ namespace Spirit_Of_Carpats_Remake.Interfaces
 {
     public interface IMenu
     {
-        void Update(ref GameState state, Music ambientMusic);
-        void Draw(GameState state);
+        void Update(ref GameState state, GameSettings settings, Music ambientMusic);
+        void Draw(GameState state, GameSettings settings);
     }
 }

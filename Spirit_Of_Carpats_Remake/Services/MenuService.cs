@@ -111,7 +111,7 @@ namespace Spirit_Of_Carpats_Remake.Services
                     DrawBindingButton(settings.IsEnglish ? "Jump" : "Стрибок", settings.JumpKey, "Jump", 160);
                     DrawBindingButton(settings.IsEnglish ? "Use" : "Дія", settings.InteractionKey, "Interact", 190);
 
-                    int mIdx = _isMusicOn ? 1 : 0;
+                    int mIdx = settings.MusicEnabled ? 1 : 0;
                     DrawTexturePro(_musicTextures[mIdx],
                         new Rectangle(0, 0, _musicTextures[mIdx].Width, _musicTextures[mIdx].Height),
                         _musicRect, new Vector2(0, 0), 0.0f, Color.White);
@@ -187,10 +187,10 @@ namespace Spirit_Of_Carpats_Remake.Services
             string jump = s.IsEnglish ? "Jump" : "Стрибок";
             string interact = s.IsEnglish ? "Use" : "Дія";
 
-            if (IsButtonClicked($"{left}: {s.LeftKey}", -120, 20)) { _waitingForKey = true; _bindingTarget = "Left"; }
-            if (IsButtonClicked($"{right}: {s.RightKey}", -60, 20)) { _waitingForKey = true; _bindingTarget = "Right"; }
-            if (IsButtonClicked($"{jump}: {s.JumpKey}", 0, 20)) { _waitingForKey = true; _bindingTarget = "Jump"; }
-            if (IsButtonClicked($"{interact}: {s.InteractionKey}", 60, 20)) { _waitingForKey = true; _bindingTarget = "Interact"; }
+            if (IsButtonClicked($"{left}: {s.LeftKey}", 100, 660)) { _waitingForKey = true; _bindingTarget = "Left"; }
+            if (IsButtonClicked($"{right}: {s.RightKey}", 130, 660)) { _waitingForKey = true; _bindingTarget = "Right"; }
+            if (IsButtonClicked($"{jump}: {s.JumpKey}", 160, 660)) { _waitingForKey = true; _bindingTarget = "Jump"; }
+            if (IsButtonClicked($"{interact}: {s.InteractionKey}", 190, 660)) { _waitingForKey = true; _bindingTarget = "Interact"; }
         }
 
         private void HandleBindingUpdate(GameSettings s)

@@ -10,7 +10,6 @@ class Program
 {
     static GameState currentState = GameState.MainMenu;
     static GameState targetState = GameState.MainMenu;
-
     static float fadeAlpha = 0f;
     static bool isTransitioning = false;
     static bool isClosing = false;
@@ -27,6 +26,7 @@ class Program
 
         Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
         Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.png");
+        Texture2D locationBackGround  = LoadTexture(".\\Resurses\\Img\\WoodBackground.png");
         Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
         PlayMusicStream(ambientMusic);
         SetMusicVolume(ambientMusic, 1f);
@@ -58,38 +58,21 @@ class Program
                     }
                 }
 
-                if (isTransitioning)
-                {
-                    fadeAlpha += 5f; 
-                    if (fadeAlpha >= 255)
-                    {
-                        fadeAlpha = 255;
-                        if (targetState == GameState.Closing || currentState == GameState.Closing)
-                        {
-                            isClosing = true; 
-                        }
-                        else
-                        {
-                            currentState = targetState; 
-                            isTransitioning = false;
-                        }
-                    }
-                }
-                else if (fadeAlpha > 0)
-                {
-                    fadeAlpha -= 5f; 
-                    if (fadeAlpha < 0) fadeAlpha = 0;
-                }
+                HandleFadeLogic();
 
                 BeginDrawing();
                 ClearBackground(Color.Black);
 
                 if (currentState == GameState.MainMenu)
+                {
                     DrawTexture(menuBackgroundTexture, 0, 0, Color.White);
+                }
                 else if (currentState == GameState.Settings)
+                {
                     DrawTexture(optionBackgroundTexture, 0, 0, Color.White);
+                }
 
-                mainMenu.Draw(currentState);
+                    mainMenu.Draw(currentState);
 
                 if (fadeAlpha > 0)
                 {
@@ -109,5 +92,28 @@ class Program
         UnloadMusicStream(ambientMusic);
         CloseAudioDevice();
         CloseWindow();
+    }
+
+    static void HandleFadeLogic()
+    {
+        if (isTransitioning)
+        {
+            fadeAlpha += 5f;
+            if (fadeAlpha >= 255)
+            {
+                fadeAlpha = 255;
+                if (targetState == GameState.Closing) isClosing = true;
+                else
+                {
+                    currentState = targetState;
+                    isTransitioning = false;
+                }
+            }
+        }
+        else if (fadeAlpha > 0)
+        {
+            fadeAlpha -= 5f;
+            if (fadeAlpha < 0) fadeAlpha = 0;
+        }
     }
 }

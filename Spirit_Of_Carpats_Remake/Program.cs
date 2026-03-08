@@ -27,6 +27,7 @@ class Program
 
         Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
         Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.png");
+        Texture2D locationBackGround  = LoadTexture(".\\Resurses\\Img\\WoodBackground.png");
         Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
         PlayMusicStream(ambientMusic);
         SetMusicVolume(ambientMusic, 1f);
@@ -88,8 +89,9 @@ class Program
                     DrawTexture(menuBackgroundTexture, 0, 0, Color.White);
                 else if (currentState == GameState.Settings)
                     DrawTexture(optionBackgroundTexture, 0, 0, Color.White);
+                //else if(currentState == GameState.)
 
-                mainMenu.Draw(currentState);
+                    mainMenu.Draw(currentState);
 
                 if (fadeAlpha > 0)
                 {

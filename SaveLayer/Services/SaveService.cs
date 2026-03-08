@@ -1,4 +1,4 @@
-﻿using SaveLayer.Models;
+﻿
 using Spirit_Of_Carpats_Remake.Models;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,6 @@ namespace SaveLayer.Services
     {
         public static void SavePlayer(int posX, int posY, Chapter chapter, string location)
         {
-
             JsonSerializer.Serialize();
         }
     }

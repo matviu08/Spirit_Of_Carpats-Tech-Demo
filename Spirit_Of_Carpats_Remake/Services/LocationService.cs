@@ -23,7 +23,7 @@ namespace Spirit_Of_Carpats_Remake.Services
         public LocationService()
         {
             _treesTexture = LoadTexture("./Resurses/Img/TreeTest.png");
-            _forestBackground = LoadTexture("./Resurses/Img/WoodBackground.png");
+            _forestBackground = LoadTexture("./Resurses/Img/location.png");
             _bushTexture = LoadTexture("./Resurses/Img/Bush.png");
 
             _random = new Random();

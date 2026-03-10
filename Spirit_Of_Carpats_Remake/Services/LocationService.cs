@@ -13,6 +13,7 @@ namespace Spirit_Of_Carpats_Remake.Services
         private Texture2D _forestBackground;
         private Texture2D _treesTexture;
         private Texture2D _bushTexture;
+        private Texture2D _cloud;
         private List<Tree> _trees;
         private Random _random;
 
@@ -23,8 +24,10 @@ namespace Spirit_Of_Carpats_Remake.Services
         public LocationService()
         {
             _treesTexture = LoadTexture("./Resurses/Img/TreeTest.png");
-            _forestBackground = LoadTexture("./Resurses/Img/location.png");
+            _forestBackground = LoadTexture(".\\Resurses\\Img\\location.png");
             _bushTexture = LoadTexture("./Resurses/Img/Bush.png");
+            _cloud = LoadTexture(".\\Resurses\\Img\\cloud.png");
+            
 
             _random = new Random();
             _trees = new List<Tree>();
@@ -33,31 +36,31 @@ namespace Spirit_Of_Carpats_Remake.Services
             _initialScreenWidth = GetScreenWidth();
             _initialScreenHeight = GetScreenHeight();
 
-            int treeCount = 15;
+            //int treeCount = 15;
 
-            for (int i = 0; i < treeCount; i++)
-            {
-                // Розміри дерев НЕ змінюємо — Scale розраховується один раз на старті
-                float scaleX = (float)_initialScreenWidth / _treesTexture.Width / 5f;
-                float scaleY = (float)_initialScreenHeight / _treesTexture.Height / 5f;
-                float scale = Math.Min(scaleX, scaleY);
+            //for (int i = 0; i < treeCount; i++)
+            //{
+            //    // Розміри дерев НЕ змінюємо — Scale розраховується один раз на старті
+            //    float scaleX = (float)_initialScreenWidth / _treesTexture.Width / 5f;
+            //    float scaleY = (float)_initialScreenHeight / _treesTexture.Height / 5f;
+            //    float scale = Math.Min(scaleX, scaleY);
 
-                // Позиція X у пікселях відносно початкового розміру вікна
-                float percentX = (float)_random.NextDouble(); // 0..1
-                float posX = percentX * _initialScreenWidth;
+            //    // Позиція X у пікселях відносно початкового розміру вікна
+            //    float percentX = (float)_random.NextDouble(); // 0..1
+            //    float posX = percentX * _initialScreenWidth;
 
-                // Y ставимо на низ початкового вікна (щоб зберегти "нижню" позицію)
-                float posY = _initialScreenHeight / 2f;
+            //    // Y ставимо на низ початкового вікна (щоб зберегти "нижню" позицію)
+            //    float posY = _initialScreenHeight / 2f;
 
-                Tree tree = new Tree
-                {
-                    Position = new Vector2(posX, posY), // зберігаємо у пікселях від початкового розміру
-                    Scale = scale,
-                    Rotation = 0f
-                };
+            //    Tree tree = new Tree
+            //    {
+            //        Position = new Vector2(posX, posY), // зберігаємо у пікселях від початкового розміру
+            //        Scale = scale,
+            //        Rotation = 0f
+            //    };
 
-                _trees.Add(tree);
-            }
+            //    _trees.Add(tree);
+            //}
         }
 
         public void Draw(GameState state)
@@ -73,6 +76,15 @@ namespace Spirit_Of_Carpats_Remake.Services
             float posX = (GetScreenWidth() - width) / 2f;
             float posY = (GetScreenHeight() - height) / 2f;
 
+            float cloudScaleX = (float)GetScreenWidth() / _cloud.Width / 2f;
+            float cloudScaleY = (float)GetScreenHeight() / _cloud.Height / 2f;
+            float widthCloud = _cloud.Width * cloudScaleX / 4f;
+            float heightCloud = _cloud.Height * cloudScaleY / 4f;
+
+            float posXCloud = (GetScreenWidth() - widthCloud) / 2f;
+            float posYCloud = (GetScreenHeight() - heightCloud) / 4f;
+
+
             DrawTexturePro(
                 _forestBackground,
                 new Rectangle(0, 0, _forestBackground.Width, _forestBackground.Height),
@@ -82,37 +94,14 @@ namespace Spirit_Of_Carpats_Remake.Services
                 Color.White
             );
 
-            // Малюємо дерева: адаптуємо X під поточну ширину вікна, Y — завжди низ вікна (нижній край дерева = низ вікна)
-            foreach (var tree in _trees)
-            {
-                Rectangle source = new Rectangle(0, 0, _treesTexture.Width, _treesTexture.Height);
-
-                float destWidth = _treesTexture.Width * tree.Scale;
-                float destHeight = _treesTexture.Height * tree.Scale;
-
-                // Масштабування X від початкового розміру до поточного
-                float scaledX = tree.Position.X * (float)GetScreenWidth() / _initialScreenWidth;
-
-                // Обмежуємо X, щоб дерево не вийшло за межі екрану
-                scaledX = MathF.Max(0f, MathF.Min(scaledX, GetScreenWidth() - destWidth));
-
-                // Встановлюємо верхній лівий кут dest так, щоб низ дерева точно співпадав з низом вікна
-                Rectangle dest = new Rectangle(
-                    scaledX,
-                    GetScreenHeight(), // встановлюємо нижню межу дерева на низ екрану
-                    destWidth,
-                    destHeight
-                );
-
-                // origin: центр по X і низ по Y
-                Vector2 origin = new Vector2(destWidth / 2f, 0f); // нижній край дерева
-
-                DrawTexturePro(_treesTexture, source, dest, origin, tree.Rotation, Color.White);
-            }
-            // кущ (залишаємо як було, стоїть на низу вікна)
-            float bushPosX = GetScreenWidth() * 0.05f; // 5% від ширини
-            float bushPosY = GetScreenHeight() - _bushTexture.Height;
-            DrawTexture(_bushTexture, (int)bushPosX, (int)bushPosY, Color.White);
+            DrawTexturePro(
+                _cloud,
+                new Rectangle(0, 0, _cloud.Width, _cloud.Height),
+                new Rectangle(posXCloud, posYCloud, widthCloud, heightCloud),
+                new Vector2(0, 0),
+                0,
+                Color.White
+            );
         }
 
         public void Update(ref GameState state)
@@ -126,8 +115,9 @@ namespace Spirit_Of_Carpats_Remake.Services
         public void Unload()
         {
             UnloadTexture(_forestBackground);
-            UnloadTexture(_treesTexture);
-            UnloadTexture(_bushTexture);
+            UnloadTexture(_cloud);
+            //UnloadTexture(_treesTexture);
+            //UnloadTexture(_bushTexture);
         }
     }
 }

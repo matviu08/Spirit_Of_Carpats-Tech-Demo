@@ -3,7 +3,6 @@ using Spirit_Of_Carpats_Remake.Interfaces;
 using Spirit_Of_Carpats_Remake.Models;
 using System;
 using System.Numerics;
-using System.Collections.Generic;
 using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 
@@ -14,9 +13,9 @@ namespace Spirit_Of_Carpats_Remake.Services
         private Texture2D _forestBackground;
         private Texture2D _cloud;
 
-        const int G = 800; 
-        const float PlayerJumpSpeed = 450.0f;
-        const float PlayerHorSpeed = 300.0f;
+        const int G = 800;
+        const float PlayerJumpSpeed = 450f;
+        const float PlayerHorSpeed = 300f;
 
         private struct Player
         {
@@ -33,48 +32,54 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             public EnvItem(Rectangle rect, int blocking, Color color)
             {
-                this.Rect = rect;
-                this.Blocking = blocking;
-                this.Color = color;
+                Rect = rect;
+                Blocking = blocking;
+                Color = color;
             }
         }
 
         private Player _player;
         private Camera2D _camera;
         private EnvItem[] _envItems;
-        private int _cameraOption = 4; 
+
+        private int MAP_WIDTH;
+        private int MAP_HEIGHT;
 
         public LocationService()
         {
             _forestBackground = LoadTexture("./Resurses/Img/location.png");
             _cloud = LoadTexture("./Resurses/Img/cloud.png");
 
-            // Ініціалізація гравця
-            _player = new Player();
-            _player.Position = new Vector2(400, 200);
-            _player.Speed = 0;
-            _player.CanJump = false;
-
-            // Ініціалізація світу (платформи)
-            _envItems = new EnvItem[]
+            _player = new Player
             {
-                new EnvItem(new Rectangle(0, 400, 1000, 200), 1, Color.Gray),
-                //new EnvItem(new Rectangle(300, 200, 400, 10), 1, Color.DarkGray),
-                //new EnvItem(new Rectangle(250, 300, 100, 10), 1, Color.DarkGray),
-                //new EnvItem(new Rectangle(650, 300, 100, 10), 1, Color.DarkGray)
+                Position = new Vector2(400, 0),
+                Speed = 0,
+                CanJump = false
             };
 
-            // Налаштування камери
-            _camera = new Camera2D();
-            _camera.Target = _player.Position;
-            _camera.Offset = new Vector2(GetScreenWidth() / 2, GetScreenHeight() / 2);
-            _camera.Rotation = 0.0f;
-            _camera.Zoom = 1.0f;
+            _envItems = new EnvItem[]
+            {
+                new EnvItem(
+                    new Rectangle(-200, GetScreenHeight()/2f, GetScreenWidth()*2f,100),
+                    1,
+                    Color.Blank)
+            };
+
+            MAP_WIDTH = _forestBackground.Width;
+            MAP_HEIGHT = _forestBackground.Height;
+
+            _camera = new Camera2D
+            {
+                Target = new Vector2(_player.Position.X, _player.Position.Y),
+                Offset = new Vector2(GetScreenWidth() / 2f, GetScreenHeight() / 2f),
+                Rotation = 0,
+                Zoom = 1
+            };
         }
 
         public void Update(ref GameState state)
         {
-            float deltaTime = GetFrameTime();
+            float dt = GetFrameTime();
 
             if (IsKeyPressed(KeyboardKey.Escape))
             {
@@ -82,74 +87,75 @@ namespace Spirit_Of_Carpats_Remake.Services
                 return;
             }
 
-            UpdatePlayer(ref _player, _envItems, deltaTime);
+            UpdatePlayer(ref _player, _envItems, dt);
 
-            _camera.Zoom += (GetMouseWheelMove() * 0.05f);
-            if (_camera.Zoom > 3.0f) _camera.Zoom = 3.0f;
-            else if (_camera.Zoom < 0.25f) _camera.Zoom = 0.25f;
+            UpdateCameraPlatformer(ref _camera, ref _player, dt);
 
-            if (IsKeyPressed(KeyboardKey.R))
-            {
-                _camera.Zoom = 1.0f;
-                _player.Position = new Vector2(400, 200);
-            }
+            ClampCamera();
+        }
 
+        private void ClampCamera()
+        {
+            float halfW = GetScreenWidth() / 2f;
+            float halfH = GetScreenHeight() / 2f;
 
-            if (IsKeyPressed(KeyboardKey.C)) _cameraOption = (_cameraOption + 1) % 5;
-
-
-            switch (_cameraOption)
-            {
-                case 0: UpdateCameraCenter(ref _camera, ref _player, GetScreenWidth(), GetScreenHeight()); break;
-                case 1: UpdateCameraCenterInsideMap(ref _camera, ref _player, _envItems, GetScreenWidth(), GetScreenHeight()); break;
-                case 2: UpdateCameraCenterSmoothFollow(ref _camera, ref _player, deltaTime, GetScreenWidth(), GetScreenHeight()); break;
-                case 3: UpdateCameraEvenOutOnLanding(ref _camera, ref _player, deltaTime, GetScreenWidth(), GetScreenHeight()); break;
-                case 4: UpdateCameraPlayerBoundsPush(ref _camera, ref _player, GetScreenWidth(), GetScreenHeight()); break;
-            }
+            _camera.Target.X = Math.Clamp(_camera.Target.X, halfW, MAP_WIDTH - halfW);
+            _camera.Target.Y = Math.Clamp(_camera.Target.Y, halfH, MAP_HEIGHT - halfH);
         }
 
         public void Draw(GameState state)
         {
+            float bgScale = Math.Max(
+                (float)GetScreenWidth() / _forestBackground.Width,
+                (float)GetScreenHeight() / _forestBackground.Height);
 
-            float bgScale = Math.Max((float)GetScreenWidth() / _forestBackground.Width, (float)GetScreenHeight() / _forestBackground.Height);
-            DrawTextureEx(_forestBackground, Vector2.Zero, 0, bgScale, Color.White);
+            Vector2 bgPos = new Vector2(
+                -_camera.Target.X * 0.2f,
+                -_camera.Target.Y * 0.2f
+            );
 
+            DrawTextureEx(_forestBackground, bgPos, 0, bgScale, Color.White);
 
-            DrawTextureEx(_cloud, new Vector2(100, 50), 0, 0.5f, Color.White);
-
+            DrawTextureEx(_cloud,
+                new Vector2(-_camera.Target.X * 0.3f + 100, 50),
+                0,
+                0.5f,
+                Color.White);
 
             BeginMode2D(_camera);
 
+            foreach (var env in _envItems)
+                DrawRectangleRec(env.Rect, env.Color);
 
-            for (int i = 0; i < _envItems.Length; i++)
-            {
-                DrawRectangleRec(_envItems[i].Rect, _envItems[i].Color);
-            }
+            Rectangle playerRect =
+                new Rectangle(_player.Position.X - 20, _player.Position.Y - 40, 40, 40);
 
-            Rectangle playerRect = new(_player.Position.X - 20, _player.Position.Y - 40, 40, 40);
             DrawRectangleRec(playerRect, Color.Red);
 
             EndMode2D();
 
-            DrawText($"Camera Mode: {_cameraOption}", 10, 10, 20, Color.Black);
-            DrawText("Use WASD/Arrows to move, Space to Jump, C to change Camera", 10, 40, 20, Color.DarkGray);
+            DrawText("WASD / Arrows - Move", 10, 10, 20, Color.Black);
+            DrawText("Space - Jump", 10, 40, 20, Color.DarkGray);
         }
 
         private void UpdatePlayer(ref Player player, EnvItem[] envItems, float delta)
         {
-            if (IsKeyDown(KeyboardKey.Left) || IsKeyDown(KeyboardKey.A)) player.Position.X -= PlayerHorSpeed * delta;
-            if (IsKeyDown(KeyboardKey.Right) || IsKeyDown(KeyboardKey.D)) player.Position.X += PlayerHorSpeed * delta;
+            if (IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left))
+                player.Position.X -= PlayerHorSpeed * delta;
 
-            if ((IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.W)) && player.CanJump)
+            if (IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right))
+                player.Position.X += PlayerHorSpeed * delta;
+
+            if ((IsKeyPressed(KeyboardKey.Space) || IsKeyPressed(KeyboardKey.W)) && player.CanJump)
             {
                 player.Speed = -PlayerJumpSpeed;
                 player.CanJump = false;
             }
 
             bool hitObstacle = false;
-            for (int i = 0; i < envItems.Length; i++)
+
+            foreach (var ei in envItems)
             {
-                EnvItem ei = envItems[i];
                 if (ei.Blocking != 0 &&
                     ei.Rect.X <= player.Position.X &&
                     ei.Rect.X + ei.Rect.Width >= player.Position.X &&
@@ -157,7 +163,7 @@ namespace Spirit_Of_Carpats_Remake.Services
                     ei.Rect.Y <= player.Position.Y + player.Speed * delta)
                 {
                     hitObstacle = true;
-                    player.Speed = 0.0f;
+                    player.Speed = 0;
                     player.Position.Y = ei.Rect.Y;
                     break;
                 }
@@ -175,56 +181,22 @@ namespace Spirit_Of_Carpats_Remake.Services
             }
         }
 
-
-        private void UpdateCameraCenter(ref Camera2D camera, ref Player player, int width, int height)
+        private void UpdateCameraPlatformer(ref Camera2D camera, ref Player player, float dt)
         {
-            camera.Offset = new Vector2(width / 2.0f, height / 2.0f);
-            camera.Target = player.Position;
-        }
+            float lookAhead = 120;
 
-        private void UpdateCameraPlayerBoundsPush(ref Camera2D camera, ref Player player, int width, int height)
-        {
+            float targetX = player.Position.X;
 
-            Vector2 bbox = new(0.2f, 0.2f);
+            if (IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right))
+                targetX += lookAhead;
 
-            Vector2 bboxWorldMin = GetScreenToWorld2D(new Vector2((1 - bbox.X) * 0.5f * width, (1 - bbox.Y) * 0.5f * height), camera);
-            Vector2 bboxWorldMax = GetScreenToWorld2D(new Vector2((1 + bbox.X) * 0.5f * width, (1 + bbox.Y) * 0.5f * height), camera);
+            if (IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left))
+                targetX -= lookAhead;
 
-            camera.Offset = new Vector2((1 - bbox.X) * 0.5f * width, (1 - bbox.Y) * 0.5f * height);
+            camera.Target.X = Lerp(camera.Target.X, targetX, 0.1f);
 
-            if (player.Position.X < bboxWorldMin.X) camera.Target.X = player.Position.X;
-            if (player.Position.Y < bboxWorldMin.Y) camera.Target.Y = player.Position.Y;
-            if (player.Position.X > bboxWorldMax.X) camera.Target.X = bboxWorldMin.X + (player.Position.X - bboxWorldMax.X);
-            if (player.Position.Y > bboxWorldMax.Y) camera.Target.Y = bboxWorldMin.Y + (player.Position.Y - bboxWorldMax.Y);
-        }
-
-
-        private void UpdateCameraCenterInsideMap(ref Camera2D camera, ref Player player, EnvItem[] envItems, int width, int height)
-        {
-            camera.Target = player.Position;
-            camera.Offset = new Vector2(width / 2.0f, height / 2.0f);
-            // Тут можна додати логіку обмеження краями мапи
-        }
-
-        private void UpdateCameraCenterSmoothFollow(ref Camera2D camera, ref Player player, float delta, int width, int height)
-        {
-            float minSpeed = 30;
-            float fractionSpeed = 0.8f;
-            camera.Offset = new Vector2(width / 2.0f, height / 2.0f);
-            Vector2 diff = Vector2Subtract(player.Position, camera.Target);
-            float length = Vector2Length(diff);
-            if (length > 10)
-            {
-                float speed = Math.Max(fractionSpeed * length, minSpeed);
-                camera.Target = Vector2Add(camera.Target, Vector2Scale(diff, speed * delta / length));
-            }
-        }
-
-        private void UpdateCameraEvenOutOnLanding(ref Camera2D camera, ref Player player, float delta, int width, int height)
-        {
-            camera.Target.X = player.Position.X;
-            camera.Offset = new Vector2(width / 2.0f, height / 2.0f);
-            camera.Target.Y = Lerp(camera.Target.Y, player.Position.Y, 0.1f);
+            if (player.CanJump)
+                camera.Target.Y = Lerp(camera.Target.Y, player.Position.Y, 0.08f);
         }
 
         public void Unload()

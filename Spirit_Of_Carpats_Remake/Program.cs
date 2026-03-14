@@ -28,6 +28,7 @@ class Program
 
         Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
         Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.png");
+        Texture2D loadedBackgroundTexture = LoadTexture(".\\Resurses\\Img\\loadBack.jpg");
         Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
         PlayMusicStream(ambientMusic);
         SetMusicVolume(ambientMusic, 1f);
@@ -44,9 +45,9 @@ class Program
                 {
                     GameState oldState = currentState;
 
-                    if (currentState == GameState.MainMenu || currentState == GameState.Settings)
+                    if (currentState == GameState.MainMenu || currentState == GameState.Settings || currentState == GameState.Chapters)
                         mainMenu.Update(ref currentState, settings, ambientMusic);
-                    else if (currentState == GameState.Chapters || currentState == GameState.InGame)
+                    else if (currentState == GameState.InGame)
                         locationService.Update(ref currentState);
 
                     if (currentState != oldState)
@@ -62,11 +63,11 @@ class Program
                 BeginDrawing();
                 ClearBackground(Color.Black);
 
-                DrawBackground(menuBackgroundTexture, optionBackgroundTexture);
+                DrawBackground(menuBackgroundTexture, optionBackgroundTexture, loadedBackgroundTexture);
 
-                if (currentState == GameState.MainMenu || currentState == GameState.Settings)
+                if (currentState == GameState.MainMenu || currentState == GameState.Settings || currentState == GameState.Chapters)
                     mainMenu.Draw(currentState, settings);
-                else if (currentState == GameState.Chapters || currentState == GameState.InGame)
+                else if (currentState == GameState.InGame)
                     locationService.Draw(currentState);
 
                 if (fadeAlpha > 0)
@@ -113,7 +114,7 @@ class Program
         }
     }
 
-    static void DrawBackground(Texture2D menu, Texture2D options)
+    static void DrawBackground(Texture2D menu, Texture2D options, Texture2D loaded)
     {
         int width = GetScreenWidth();
         int height = GetScreenHeight();
@@ -123,6 +124,8 @@ class Program
             textureToDraw = menu;
         else if (currentState == GameState.Settings)
             textureToDraw = options;
+        else if (currentState == GameState.Chapters)
+            textureToDraw = loaded;
         else
             return; 
 

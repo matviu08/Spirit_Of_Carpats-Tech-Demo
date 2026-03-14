@@ -53,7 +53,7 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             if (state == GameState.MainMenu)
             {
-                if (IsButtonClicked(settings.IsEnglish ? "New Game" : "Нова Гра", 10, 40)) state = GameState.Chapters;
+                if (IsButtonClicked(settings.IsEnglish ? "New Game" : "Нова Гра", 10, 40)) state = GameState.InGame;
                 if (IsButtonClicked(settings.IsEnglish ? "Load Game" : "Загрузити", 60, 40)) state = GameState.Chapters;
                 if (IsButtonClicked(settings.IsEnglish ? "Options" : "Налаштовка", 130, 40)) state = GameState.Settings;
                 if (IsButtonClicked(settings.IsEnglish ? "Exit" : "Вихід", 190, 40)) state = GameState.Closing; 
@@ -87,6 +87,11 @@ namespace Spirit_Of_Carpats_Remake.Services
                     string backText = settings.IsEnglish ? "Back" : "Назад";
                     if (IsButtonClicked(backText, 270, 350)) state = GameState.MainMenu;
                 }
+            }
+            else if (state == GameState.Chapters)
+            {
+                string backText = settings.IsEnglish ? "Back" : "Назад";
+                if (IsButtonClicked(backText, 325, 530)) state = GameState.MainMenu;
             }
         }
         
@@ -122,6 +127,10 @@ namespace Spirit_Of_Carpats_Remake.Services
                 }
 
                 DrawMenuButton(settings.IsEnglish ? "Back" : "Назад", 270, 350);
+            }
+            else if (state == GameState.Chapters)
+            {
+                DrawMenuButton(settings.IsEnglish ? "Back" : "Назад", 325, 530);
             }
         }
 

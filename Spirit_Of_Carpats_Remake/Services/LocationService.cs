@@ -10,6 +10,14 @@ namespace Spirit_Of_Carpats_Remake.Services
 {
     public class LocationService : ILocationService
     {
+        private Texture2D[] _walkAnimFrames = new Texture2D[19];
+        private int _currentFrame = 0;
+        private float _animTimer = 0f;
+        private const float AnimSpeed = 0.05f;
+        private bool _isFacingRight = true;
+        private Texture2D _standingTexture;
+        private bool _isMoving = false;
+
         private Texture2D _forestBackground;
         private Texture2D _cloud;
 
@@ -47,7 +55,12 @@ namespace Spirit_Of_Carpats_Remake.Services
 
         public LocationService()
         {
-            _forestBackground = LoadTexture("./Resurses/Img/location.png");
+            _forestBackground = LoadTexture("./Resurses/Img/location.png"); 
+            for (int i = 0; i < 19; i++)
+            {
+                _walkAnimFrames[i] = LoadTexture($"./Resurses/Img/wolcking/walkingAnim{i + 1}.png");
+            }
+            _standingTexture = LoadTexture("./Resurses/Img/standing.png");
             _cloud = LoadTexture("./Resurses/Img/cloud.png");
 
             _player = new Player
@@ -125,12 +138,41 @@ namespace Spirit_Of_Carpats_Remake.Services
             BeginMode2D(_camera);
 
             foreach (var env in _envItems)
+            {
                 DrawRectangleRec(env.Rect, env.Color);
+            }
 
-            Rectangle playerRect =
-                new Rectangle(_player.Position.X - 20, _player.Position.Y - 40, 40, 40);
+            Texture2D currentTex;
 
-            DrawRectangleRec(playerRect, Color.Red);
+            if (_isMoving && _player.CanJump)
+            {
+                currentTex = _walkAnimFrames[_currentFrame];
+            }
+            else
+            {
+                currentTex = _standingTexture;
+            }
+
+            Rectangle sourceRec = new Rectangle(0, 0, currentTex.Width, currentTex.Height);
+
+            if (!_isFacingRight)
+            {
+                sourceRec.Width *= -1;
+            }
+
+            float targetHeight = 160f;
+            float scale = targetHeight / currentTex.Height;
+
+            Rectangle destRec = new Rectangle(
+                _player.Position.X,
+                _player.Position.Y,
+                currentTex.Width * scale,
+                currentTex.Height * scale 
+            );
+
+            Vector2 origin = new Vector2(destRec.Width / 2, destRec.Height);
+
+            DrawTexturePro(currentTex, sourceRec, destRec, origin, 0.0f, Color.White);
 
             EndMode2D();
 
@@ -140,16 +182,41 @@ namespace Spirit_Of_Carpats_Remake.Services
 
         private void UpdatePlayer(ref Player player, EnvItem[] envItems, float delta)
         {
+            _isMoving = false;
+
             if (IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left))
+            {
                 player.Position.X -= PlayerHorSpeed * delta;
+                _isFacingRight = false;
+                _isMoving = true;
+            }
 
             if (IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right))
+            {
                 player.Position.X += PlayerHorSpeed * delta;
+                _isFacingRight = true;
+                _isMoving = true;
+            }
 
             if ((IsKeyPressed(KeyboardKey.Space) || IsKeyPressed(KeyboardKey.W)) && player.CanJump)
             {
                 player.Speed = -PlayerJumpSpeed;
                 player.CanJump = false;
+            }
+
+            if (_isMoving && player.CanJump)
+            {
+                _animTimer += delta;
+                if (_animTimer >= AnimSpeed)
+                {
+                    _currentFrame++;
+                    if (_currentFrame >= 19) _currentFrame = 0;
+                    _animTimer = 0f;
+                }
+            }
+            else
+            {
+                _currentFrame = 0;
             }
 
             bool hitObstacle = false;
@@ -203,6 +270,11 @@ namespace Spirit_Of_Carpats_Remake.Services
         {
             UnloadTexture(_forestBackground);
             UnloadTexture(_cloud);
+            for (int i = 0; i < 19; i++)
+            {
+                UnloadTexture(_walkAnimFrames[i]);
+            }
+            UnloadTexture(_standingTexture);
         }
     }
 }

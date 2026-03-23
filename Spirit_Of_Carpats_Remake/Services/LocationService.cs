@@ -119,24 +119,46 @@ namespace Spirit_Of_Carpats_Remake.Services
         public void Draw(GameState state)
         {
             float bgScale = Math.Max(
-                    (float)GetScreenWidth() / _forestBackground.Width,
-                    (float)GetScreenHeight() / _forestBackground.Height);
+                (float)GetScreenWidth() / _forestBackground.Width,
+                (float)GetScreenHeight() / _forestBackground.Height);
 
-            Vector2 bgPos = new Vector2(0, 0);
+            Vector2 bgPos = new Vector2(
+                -_camera.Target.X * 0.2f,
+                -_camera.Target.Y * 0.2f
+            );
 
-            int repeatCount = (int)Math.Ceiling(GetScreenWidth() / (_forestBackground.Width * bgScale)) + 1;
+            //float bgScale = Math.Max(
+            //        (float)GetScreenWidth() / _forestBackground.Width,
+            //        (float)GetScreenHeight() / _forestBackground.Height);
 
-            for (int i = 0; i < repeatCount; i++)
+            //Vector2 bgPos = new Vector2(0, 0);
+
+            //int repeatCount = (int)Math.Ceiling(GetScreenWidth() / (_forestBackground.Width * bgScale)) + 1;
+
+            //for (int i = 0; i < repeatCount; i++)
+            //{
+            //    Vector2 pos = new Vector2(
+            //        bgPos.X + i * _forestBackground.Width * bgScale,
+            //        bgPos.Y
+            //    );
+
+            //    DrawTextureEx(_forestBackground, pos, 0, bgScale, Color.White);
+            //}
+
+            int repeatCountX = (int)Math.Ceiling(GetScreenWidth() / (_forestBackground.Width * bgScale)) + 2;
+
+            for(int i =0; i< repeatCountX; ++i)
             {
                 Vector2 pos = new Vector2(
                     bgPos.X + i * _forestBackground.Width * bgScale,
                     bgPos.Y
                 );
-
                 DrawTextureEx(_forestBackground, pos, 0, bgScale, Color.White);
             }
 
-            //////////////////////////////////////////
+
+            //DrawTextureEx(_forestBackground, bgPos, 0, bgScale, Color.White);
+
             DrawTextureEx(_cloud,
                 new Vector2(-_camera.Target.X * 0.3f + 100, 50),
                 0,

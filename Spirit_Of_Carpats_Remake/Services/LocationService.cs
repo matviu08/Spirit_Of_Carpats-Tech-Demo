@@ -61,7 +61,7 @@ namespace Spirit_Of_Carpats_Remake.Services
                 _walkAnimFrames[i] = LoadTexture($"./Resurses/Img/wolcking/walkingAnim{i + 1}.png");
             }
             _standingTexture = LoadTexture("./Resurses/Img/standing.png");
-            _cloud = LoadTexture("./Resurses/Img/cloud.png");
+            //_cloud = LoadTexture("./Resurses/Img/cloud.png");
 
             _player = new Player
             {
@@ -99,6 +99,7 @@ namespace Spirit_Of_Carpats_Remake.Services
                 state = GameState.MainMenu;
                 return;
             }
+
 
             UpdatePlayer(ref _player, _envItems, dt);
 
@@ -208,6 +209,9 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             DrawText("WASD / Arrows - Move", 10, 10, 20, Color.Black);
             DrawText("Space - Jump", 10, 40, 20, Color.DarkGray);
+
+            // туман!! Димка на екрані
+            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(Color.LightGray, 0.1f));
         }
 
         private void UpdatePlayer(ref Player player, EnvItem[] envItems, float delta)

@@ -20,6 +20,7 @@ namespace Spirit_Of_Carpats_Remake.Services
 
         private Texture2D _forestBackground;
         private Texture2D _cloud;
+        private Texture2D _treeTexture;
 
         const int G = 800;
         const float PlayerJumpSpeed = 450f;
@@ -55,7 +56,9 @@ namespace Spirit_Of_Carpats_Remake.Services
 
         public LocationService()
         {
-            _forestBackground = LoadTexture("./Resurses/Img/location.png"); 
+            _forestBackground = LoadTexture("./Resurses/Img/location.png");
+            _treeTexture = LoadTexture("./Resurses/Img/TreeTest.png");
+
             for (int i = 0; i < 19; i++)
             {
                 _walkAnimFrames[i] = LoadTexture($"./Resurses/Img/wolcking/walkingAnim{i + 1}.png");
@@ -151,6 +154,20 @@ namespace Spirit_Of_Carpats_Remake.Services
 
 
             //DrawTextureEx(_forestBackground, bgPos, 0, bgScale, Color.White);
+
+
+            float screenH = GetScreenHeight();
+            float screenW = GetScreenWidth();
+
+            int repeatTreeCounter = 15;
+            for (int i = 0; i < repeatTreeCounter; ++i)
+            {
+                Vector2 pos = new Vector2(-_camera.Target.X * 0.5f + i * (screenH * 0.2f), screenH * 0.4f + screenH * 0.15f);
+
+                float scaleTree = screenH / 1000f;
+
+                DrawTextureEx(_treeTexture, pos, 0, scaleTree, Color.White);
+            }
 
             DrawTextureEx(_cloud,
                 new Vector2(-_camera.Target.X * 0.3f + 100, 50),
@@ -296,6 +313,7 @@ namespace Spirit_Of_Carpats_Remake.Services
         {
             UnloadTexture(_forestBackground);
             UnloadTexture(_cloud);
+            UnloadTexture(_treeTexture);
             for (int i = 0; i < 19; i++)
             {
                 UnloadTexture(_walkAnimFrames[i]);

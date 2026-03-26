@@ -73,9 +73,8 @@ namespace Spirit_Of_Carpats_Remake.Services
             _envItems = new EnvItem[]
             {
                 new EnvItem(
-                    new Rectangle(-200, GetScreenHeight()/2f, GetScreenWidth()*2f,100),
-                    1,
-                    Color.Blank)
+                    new Rectangle(-200, GetScreenHeight()/4, GetScreenWidth()*2f,100), 1,
+                    Color.Gray)
             };
 
             MAP_WIDTH = _forestBackground.Width;
@@ -83,8 +82,8 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             _camera = new Camera2D
             {
-                Target = new Vector2(_player.Position.X, _player.Position.Y),
-                Offset = new Vector2(GetScreenWidth() / 2f, GetScreenHeight() / 2f),
+                Target = new Vector2(_player.Position.X, _player.Position.Y * 1.5f),
+                Offset = new Vector2(GetScreenWidth() / 2f, GetScreenHeight() / 2.0f),
                 Rotation = 0,
                 Zoom = 1
             };
@@ -105,17 +104,10 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             UpdateCameraPlatformer(ref _camera, ref _player, dt);
 
-            ClampCamera();
+            
         }
 
-        private void ClampCamera()
-        {
-            float halfW = GetScreenWidth() / 2f;
-            float halfH = GetScreenHeight() / 2f;
-
-            _camera.Target.X = Math.Clamp(_camera.Target.X, halfW, MAP_WIDTH - halfW);
-            _camera.Target.Y = Math.Clamp(_camera.Target.Y, halfH, MAP_HEIGHT - halfH);
-        }
+      
 
         public void Draw(GameState state)
         {
@@ -265,7 +257,7 @@ namespace Spirit_Of_Carpats_Remake.Services
                 {
                     hitObstacle = true;
                     player.Speed = 0;
-                    player.Position.Y = ei.Rect.Y;
+                    player.Position.Y = ei.Rect.Y ;
                     break;
                 }
             }
@@ -297,7 +289,7 @@ namespace Spirit_Of_Carpats_Remake.Services
             camera.Target.X = Lerp(camera.Target.X, targetX, 0.1f);
 
             if (player.CanJump)
-                camera.Target.Y = Lerp(camera.Target.Y, player.Position.Y, 0.08f);
+                camera.Target.Y = Lerp(camera.Target.Y , player.Position.Y / GetScreenHeight() / 153.6f, 0.08f);
         }
 
         public void Unload()

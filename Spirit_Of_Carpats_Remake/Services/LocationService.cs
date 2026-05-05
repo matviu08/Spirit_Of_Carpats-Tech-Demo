@@ -54,6 +54,7 @@ namespace Spirit_Of_Carpats_Remake.Services
         private int MAP_WIDTH;
         private int MAP_HEIGHT;
 
+        private const float GROUND_LEVEL = 500f;
         public LocationService()
         {
             _forestBackground = LoadTexture("./Resurses/Img/location.png");
@@ -68,17 +69,18 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             _player = new Player
             {
-                Position = new Vector2(400, 0),
+                Position = new Vector2(400, 100), 
                 Speed = 0,
                 CanJump = false
             };
 
             _envItems = new EnvItem[]
             {
-                new EnvItem(
-                    new Rectangle(-200, GetScreenHeight()/4, GetScreenWidth()*2f,100), 1,
-                    Color.Gray)
+                new EnvItem(new Rectangle(-2000, GROUND_LEVEL, 4000, 1000), 1, Color.Gray)
             };
+
+            _player.Position = new Vector2(400, GROUND_LEVEL - 50);
+            _envItems[0].Rect.Y = GetScreenHeight() * 0.75f;
 
             MAP_WIDTH = _forestBackground.Width;
             MAP_HEIGHT = _forestBackground.Height;
@@ -114,6 +116,7 @@ namespace Spirit_Of_Carpats_Remake.Services
 
         public void Draw(GameState state)
         {
+
             float bgScale = Math.Max(
                 (float)GetScreenWidth() / _forestBackground.Width,
                 (float)GetScreenHeight() / _forestBackground.Height);
@@ -122,24 +125,6 @@ namespace Spirit_Of_Carpats_Remake.Services
                 -_camera.Target.X * 0.2f,
                 -_camera.Target.Y * 0.2f
             );
-
-            //float bgScale = Math.Max(
-            //        (float)GetScreenWidth() / _forestBackground.Width,
-            //        (float)GetScreenHeight() / _forestBackground.Height);
-
-            //Vector2 bgPos = new Vector2(0, 0);
-
-            //int repeatCount = (int)Math.Ceiling(GetScreenWidth() / (_forestBackground.Width * bgScale)) + 1;
-
-            //for (int i = 0; i < repeatCount; i++)
-            //{
-            //    Vector2 pos = new Vector2(
-            //        bgPos.X + i * _forestBackground.Width * bgScale,
-            //        bgPos.Y
-            //    );
-
-            //    DrawTextureEx(_forestBackground, pos, 0, bgScale, Color.White);
-            //}
 
             int repeatCountX = (int)Math.Ceiling(GetScreenWidth() / (_forestBackground.Width * bgScale)) + 2;
 
@@ -153,21 +138,36 @@ namespace Spirit_Of_Carpats_Remake.Services
             }
 
 
-            //DrawTextureEx(_forestBackground, bgPos, 0, bgScale, Color.White);
 
 
-            float screenH = GetScreenHeight();
             float screenW = GetScreenWidth();
+            float screenH = GetScreenHeight();
 
-            int repeatTreeCounter = 15;
+             bgScale = Math.Max(screenW / _forestBackground.Width, screenH / _forestBackground.Height);
+             bgPos = new Vector2(-_camera.Target.X * 0.2f, 0);
+            DrawTextureEx(_forestBackground, bgPos, 0, bgScale, Color.White);
+
+            int repeatTreeCounter = 20;
+            float treeScale = screenH / 1000f; 
             for (int i = 0; i < repeatTreeCounter; ++i)
             {
-                Vector2 pos = new Vector2(-_camera.Target.X * 0.5f + i * (screenH * 0.2f), screenH * 0.4f + screenH * 0.15f);
 
-                float scaleTree = screenH / 1000f;
-
-                DrawTextureEx(_treeTexture, pos, 0, scaleTree, Color.White);
             }
+
+            BeginMode2D(_camera);
+
+            foreach (var env in _envItems) DrawRectangleRec(env.Rect, env.Color);
+
+            for (int i = 0; i < repeatTreeCounter; ++i)
+            {
+                Vector2 treePos = new Vector2(i * 600 - 1000, GROUND_LEVEL - (_treeTexture.Height * treeScale));
+                DrawTextureEx(_treeTexture, treePos, 0, treeScale, Color.White);
+            }
+
+
+            EndMode2D();
+
+            DrawRectangle(0, 0, (int)screenW, (int)screenH, Fade(Color.LightGray, 0.1f));
 
             DrawTextureEx(_cloud,
                 new Vector2(-_camera.Target.X * 0.3f + 100, 50),
@@ -294,19 +294,17 @@ namespace Spirit_Of_Carpats_Remake.Services
         private void UpdateCameraPlatformer(ref Camera2D camera, ref Player player, float dt)
         {
             float lookAhead = 120;
-
             float targetX = player.Position.X;
 
-            if (IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right))
-                targetX += lookAhead;
-
-            if (IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left))
-                targetX -= lookAhead;
+            if (IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right)) targetX += lookAhead;
+            if (IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left)) targetX -= lookAhead;
 
             camera.Target.X = Lerp(camera.Target.X, targetX, 0.1f);
 
-            if (player.CanJump)
-                camera.Target.Y = Lerp(camera.Target.Y , player.Position.Y / GetScreenHeight() / 153.6f, 0.08f);
+            float targetY = player.Position.Y - 50;
+            camera.Target.Y = Lerp(camera.Target.Y, targetY, 0.08f);
+
+            camera.Offset = new Vector2(GetScreenWidth() / 2f, GetScreenHeight() / 2f);
         }
 
         public void Unload()

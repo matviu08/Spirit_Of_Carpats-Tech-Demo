@@ -54,7 +54,7 @@ namespace Spirit_Of_Carpats_Remake.Services
         private int MAP_WIDTH;
         private int MAP_HEIGHT;
 
-        private const float GROUND_LEVEL = 500f;
+        private float GroundLevel => GetScreenHeight() * 0.85f;
         public LocationService()
         {
             _forestBackground = LoadTexture("./Resurses/Img/location.png");
@@ -76,11 +76,12 @@ namespace Spirit_Of_Carpats_Remake.Services
 
             _envItems = new EnvItem[]
             {
-                new EnvItem(new Rectangle(-2000, GROUND_LEVEL, 4000, 1000), 1, Color.Gray)
+                new EnvItem(new Rectangle(-10000, GroundLevel, 20000, 1000), 1, Color.Blank),
+                new EnvItem(new Rectangle(0, -9999, 50, 20000), 1, Color.Blank),
             };
 
-            _player.Position = new Vector2(400, GROUND_LEVEL - 50);
-            _envItems[0].Rect.Y = GetScreenHeight() * 0.75f;
+            _player.Position = new Vector2(100, GroundLevel - 160f);
+            _envItems[0].Rect.Y = GetScreenHeight() * 0.85f;
 
             MAP_WIDTH = _forestBackground.Width;
             MAP_HEIGHT = _forestBackground.Height;
@@ -103,8 +104,10 @@ namespace Spirit_Of_Carpats_Remake.Services
                 state = GameState.MainMenu;
                 return;
             }
-
-
+            _envItems[0].Rect.Y = GetScreenHeight() * 0.75f;
+            _envItems[0].Rect.X = -GetScreenWidth() * 10f;
+            _envItems[0].Rect.Width = GetScreenWidth() * 20f;
+            _envItems[1].Rect.X = 0;
             UpdatePlayer(ref _player, _envItems, dt);
 
             UpdateCameraPlatformer(ref _camera, ref _player, dt);
@@ -112,117 +115,81 @@ namespace Spirit_Of_Carpats_Remake.Services
             
         }
 
-      
+
 
         public void Draw(GameState state)
         {
-
-            float bgScale = Math.Max(
-                (float)GetScreenWidth() / _forestBackground.Width,
-                (float)GetScreenHeight() / _forestBackground.Height);
-
-            Vector2 bgPos = new Vector2(
-                -_camera.Target.X * 0.2f,
-                -_camera.Target.Y * 0.2f
-            );
-
-            int repeatCountX = (int)Math.Ceiling(GetScreenWidth() / (_forestBackground.Width * bgScale)) + 2;
-
-            for(int i =0; i< repeatCountX; ++i)
-            {
-                Vector2 pos = new Vector2(
-                    bgPos.X + i * _forestBackground.Width * bgScale,
-                    bgPos.Y
-                );
-                DrawTextureEx(_forestBackground, pos, 0, bgScale, Color.White);
-            }
-
-
-
-
             float screenW = GetScreenWidth();
             float screenH = GetScreenHeight();
 
-             bgScale = Math.Max(screenW / _forestBackground.Width, screenH / _forestBackground.Height);
-             bgPos = new Vector2(-_camera.Target.X * 0.2f, 0);
-            DrawTextureEx(_forestBackground, bgPos, 0, bgScale, Color.White);
+            float bgScale = Math.Max(screenW / _forestBackground.Width, screenH / _forestBackground.Height);
+            float bgW = _forestBackground.Width * bgScale;
 
-            int repeatTreeCounter = 20;
-            float treeScale = screenH / 1000f; 
-            for (int i = 0; i < repeatTreeCounter; ++i)
+            // Smooth parallax — no modulo snapping
+            float parallaxOffset = -(_camera.Target.X * 0.75f);
+
+            // How many tiles needed to cover screen
+            int repeatCountX = (int)Math.Ceiling(screenW / bgW) + 2;
+
+            // Find the starting tile index based on camera position
+            int startTile = (int)Math.Floor(parallaxOffset / bgW);
+
+            for (int i = startTile - 1; i < startTile + repeatCountX + 1; i++)
             {
-
+                DrawTextureEx(_forestBackground,
+                    new Vector2(parallaxOffset + i * bgW, 0),
+                    0, bgScale, Color.White);
             }
 
-            BeginMode2D(_camera);
-
-            foreach (var env in _envItems) DrawRectangleRec(env.Rect, env.Color);
-
-            for (int i = 0; i < repeatTreeCounter; ++i)
-            {
-                Vector2 treePos = new Vector2(i * 600 - 1000, GROUND_LEVEL - (_treeTexture.Height * treeScale));
-                DrawTextureEx(_treeTexture, treePos, 0, treeScale, Color.White);
-            }
-
-
-            EndMode2D();
-
-            DrawRectangle(0, 0, (int)screenW, (int)screenH, Fade(Color.LightGray, 0.1f));
-
-            DrawTextureEx(_cloud,
-                new Vector2(-_camera.Target.X * 0.3f + 100, 50),
-                0,
-                0.5f,
-                Color.White);
-
+            // 2. World objects — inside camera mode
             BeginMode2D(_camera);
 
             foreach (var env in _envItems)
-            {
                 DrawRectangleRec(env.Rect, env.Color);
+
+            float treeScale = screenH * 0.0008f; // smaller scale
+            float treeH = _treeTexture.Height * treeScale;
+            float treeY = GroundLevel - treeH; // sits on ground in world space
+
+            // Only draw trees visible near camera (culling)
+            float camLeft = _camera.Target.X - screenW;
+            float camRight = _camera.Target.X + screenW;
+
+            int treeSpacing = 600;
+            int firstTree = (int)Math.Floor(camLeft / treeSpacing) - 1;
+            int lastTree = (int)Math.Ceiling(camRight / treeSpacing) + 1;
+
+            for (int i = firstTree; i <= lastTree; i++)
+            {
+                float treeX = i * treeSpacing;
+                DrawTextureEx(_treeTexture, new Vector2(treeX, treeY), 0, treeScale, Color.White);
             }
 
-            Texture2D currentTex;
-
-            if (_isMoving && _player.CanJump)
-            {
-                currentTex = _walkAnimFrames[_currentFrame];
-            }
-            else
-            {
-                currentTex = _standingTexture;
-            }
+            // 3. Player — inside camera mode
+            Texture2D currentTex = (_isMoving && _player.CanJump) ? _walkAnimFrames[_currentFrame] : _standingTexture;
 
             Rectangle sourceRec = new Rectangle(0, 0, currentTex.Width, currentTex.Height);
+            if (!_isFacingRight) sourceRec.Width *= -1;
 
-            if (!_isFacingRight)
-            {
-                sourceRec.Width *= -1;
-            }
-
-            float targetHeight = 160f;
+            float targetHeight = screenH * 0.17f; 
             float scale = targetHeight / currentTex.Height;
 
             Rectangle destRec = new Rectangle(
                 _player.Position.X,
                 _player.Position.Y,
                 currentTex.Width * scale,
-                currentTex.Height * scale 
+                currentTex.Height * scale
             );
 
-            Vector2 origin = new Vector2(destRec.Width / 2, destRec.Height);
-
-            DrawTexturePro(currentTex, sourceRec, destRec, origin, 0.0f, Color.White);
+            DrawTexturePro(currentTex, sourceRec, destRec, new Vector2(destRec.Width / 2, destRec.Height), 0f, Color.White);
 
             EndMode2D();
 
+            // 4. UI — screen space
+            DrawRectangle(0, 0, (int)screenW, (int)screenH, Fade(Color.LightGray, 0.1f));
             DrawText("WASD / Arrows - Move", 10, 10, 20, Color.Black);
             DrawText("Space - Jump", 10, 40, 20, Color.DarkGray);
-
-            // туман!! Димка на екрані
-            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(Color.LightGray, 0.1f));
         }
-
         private void UpdatePlayer(ref Player player, EnvItem[] envItems, float delta)
         {
             _isMoving = false;
@@ -294,17 +261,25 @@ namespace Spirit_Of_Carpats_Remake.Services
         private void UpdateCameraPlatformer(ref Camera2D camera, ref Player player, float dt)
         {
             float lookAhead = 120;
-            float targetX = player.Position.X;
+            float targetX;
+            if (player.Position.X >= GetScreenWidth() / 2)
+            {
+                targetX = player.Position.X;
 
+            }
+            else
+            {
+                targetX = GetScreenWidth() / 2;
+
+            }
             if (IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right)) targetX += lookAhead;
             if (IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left)) targetX -= lookAhead;
 
             camera.Target.X = Lerp(camera.Target.X, targetX, 0.1f);
 
-            float targetY = player.Position.Y - 50;
-            camera.Target.Y = Lerp(camera.Target.Y, targetY, 0.08f);
+            camera.Target.Y = GroundLevel;
 
-            camera.Offset = new Vector2(GetScreenWidth() / 2f, GetScreenHeight() / 2f);
+            camera.Offset = new Vector2(GetScreenWidth() / 2f, GetScreenHeight());
         }
 
         public void Unload()

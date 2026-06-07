@@ -77,7 +77,7 @@ namespace Spirit_Of_Carpats_Remake.Services
             _envItems = new EnvItem[]
             {
                 new EnvItem(new Rectangle(-10000, GroundLevel, 20000, 1000), 1, Color.Blank),
-                new EnvItem(new Rectangle(0, -9999, 50, 20000), 1, Color.Blank),
+                new EnvItem(new Rectangle(-50, -10000, 50, 20000), 1, Color.Blank),
             };
 
             _player.Position = new Vector2(100, GroundLevel - 160f);
@@ -107,7 +107,7 @@ namespace Spirit_Of_Carpats_Remake.Services
             _envItems[0].Rect.Y = GetScreenHeight() * 0.75f;
             _envItems[0].Rect.X = -GetScreenWidth() * 10f;
             _envItems[0].Rect.Width = GetScreenWidth() * 20f;
-            _envItems[1].Rect.X = 0;
+            _envItems[1].Rect.X = -50;
             UpdatePlayer(ref _player, _envItems, dt);
 
             UpdateCameraPlatformer(ref _camera, ref _player, dt);
@@ -129,7 +129,7 @@ namespace Spirit_Of_Carpats_Remake.Services
             float parallaxOffset = -(_camera.Target.X * 0.75f);
 
             // How many tiles needed to cover screen
-            int repeatCountX = (int)Math.Ceiling(screenW / bgW) + 2;
+            int repeatCountX = (int)Math.Ceiling(screenW / bgW) + 4;
 
             // Find the starting tile index based on camera position
             int startTile = (int)Math.Floor(parallaxOffset / bgW);
@@ -207,6 +207,8 @@ namespace Spirit_Of_Carpats_Remake.Services
                 _isFacingRight = true;
                 _isMoving = true;
             }
+            if (player.Position.X < 0)
+                player.Position.X = 0;
 
             if ((IsKeyPressed(KeyboardKey.Space) || IsKeyPressed(KeyboardKey.W)) && player.CanJump)
             {

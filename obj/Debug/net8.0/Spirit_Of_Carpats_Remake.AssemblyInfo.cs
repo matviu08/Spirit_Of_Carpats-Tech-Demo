@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Spirit_Of_Carpats_Remake")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e37a70e6cfeab272e256391de0d7b23912ba0743")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1d80e067f364fa0754390d309a3776b9b0195576")]
 [assembly: System.Reflection.AssemblyProductAttribute("Spirit_Of_Carpats_Remake")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Spirit_Of_Carpats_Remake")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

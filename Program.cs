@@ -15,78 +15,82 @@ class Program
     static float fadeAlpha = 0f;
     static bool isTransitioning = false;
     static bool isClosing = false;
+
+    public const int VIRTUAL_WIDTH = 1377;
+    public const int VIRTUAL_HEIGHT = 768;
+
     static void Main(string[] args)
     {
-        AutoInsertReaurses.Sync();
-        const int screenWidth = 1377;
-        const int screenHeight = 768;
-
-        InitWindow(screenWidth, screenHeight, "Дух Карпат: Забута Варта");
+        // ВИПРАВЛЕНО: Використання правильних флагів
+        SetConfigFlags(ConfigFlags.ResizableWindow); 
+        InitWindow(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, "Дух Карпат: Забута Варта");
         InitAudioDevice();
 
         SetTargetFPS(60);
 
-        Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.png");
-        Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.png");
+        RenderTexture2D target = LoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+        SetTextureFilter(target.Texture, TextureFilter.Point);
+
+        Texture2D menuBackgroundTexture = LoadTexture(".\\Resurses\\Img\\meinMenuBac.jpg");
+        Texture2D optionBackgroundTexture = LoadTexture(".\\Resurses\\Img\\optionBac.jpg");
         Texture2D loadedBackgroundTexture = LoadTexture(".\\Resurses\\Img\\loadBack.jpg");
+
         Music ambientMusic = LoadMusicStream(".\\Resurses\\Music\\meinMusicCapter1.mp3");
         PlayMusicStream(ambientMusic);
-        SetMusicVolume(ambientMusic, 1f);
+
         IMenu mainMenu = new MenuService();
         LocationService locationService = new LocationService();
 
-        try
+        while (!WindowShouldClose() && !isClosing)
         {
-            while (!WindowShouldClose() && !isClosing)
+            UpdateMusicStream(ambientMusic);
+
+            float scale = MathF.Min((float)GetScreenWidth() / VIRTUAL_WIDTH, (float)GetScreenHeight() / VIRTUAL_HEIGHT);
+
+            SetMouseOffset((int)-((GetScreenWidth() - (VIRTUAL_WIDTH * scale)) * 0.5f), (int)-((GetScreenHeight() - (VIRTUAL_HEIGHT * scale)) * 0.5f));
+            SetMouseScale(1f / scale, 1f / scale);
+
+            if (!isTransitioning)
             {
-                UpdateMusicStream(ambientMusic);
-
-                if (!isTransitioning)
-                {
-                    GameState oldState = currentState;
-
-                    if (currentState == GameState.MainMenu || currentState == GameState.Settings || currentState == GameState.Chapters)
-                        mainMenu.Update(ref currentState, settings, ambientMusic);
-                    else if (currentState == GameState.InGame)
-                        locationService.Update(ref currentState);
-
-                    if (currentState != oldState)
-                    {
-                        targetState = currentState;
-                        currentState = oldState;
-                        isTransitioning = true;
-                    }
-                }
-
-                HandleFadeLogic();
-
-                BeginDrawing();
-                ClearBackground(Color.Black);
-
-                DrawBackground(menuBackgroundTexture, optionBackgroundTexture, loadedBackgroundTexture);
-
+                GameState oldState = currentState;
                 if (currentState == GameState.MainMenu || currentState == GameState.Settings || currentState == GameState.Chapters)
-                    mainMenu.Draw(currentState, settings);
+                    mainMenu.Update(ref currentState, settings, ambientMusic);
                 else if (currentState == GameState.InGame)
-                    locationService.Draw(currentState);
+                    locationService.Update(ref currentState);
 
-                if (fadeAlpha > 0)
-                {
-                    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(Color.Black, fadeAlpha / 255f));
-                }
-
-                EndDrawing();
+                if (currentState != oldState) { targetState = currentState; currentState = oldState; isTransitioning = true; }
             }
-        }
-        catch (Exception ex) 
-        {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+
+            HandleFadeLogic();
+
+            if (currentState == GameState.InGame)
+            {
+                locationService.PrepareGraphics();
+            }
+
+            // Тепер відкриваємо головне полотно
+            BeginTextureMode(target);
+            ClearBackground(Color.Black);
+
+            DrawBackground(menuBackgroundTexture, optionBackgroundTexture, loadedBackgroundTexture);
+
+            if (currentState == GameState.MainMenu || currentState == GameState.Settings || currentState == GameState.Chapters)
+                mainMenu.Draw(currentState, settings);
+            else if (currentState == GameState.InGame)
+                locationService.Draw(currentState);
+
+            if (fadeAlpha > 0) DrawRectangle(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, Fade(Color.Black, fadeAlpha / 255f));
+            EndTextureMode();
+
+            BeginDrawing();
+            ClearBackground(Color.Black);
+            Rectangle sourceRec = new Rectangle(0.0f, 0.0f, (float)target.Texture.Width, (float)-target.Texture.Height);
+            Rectangle destRec = new Rectangle((GetScreenWidth() - ((float)VIRTUAL_WIDTH * scale)) * 0.5f, (GetScreenHeight() - ((float)VIRTUAL_HEIGHT * scale)) * 0.5f, (float)VIRTUAL_WIDTH * scale, (float)VIRTUAL_HEIGHT * scale);
+            DrawTexturePro(target.Texture, sourceRec, destRec, new Vector2(0, 0), 0.0f, Color.White);
+            EndDrawing();
         }
 
-        UnloadTexture(menuBackgroundTexture);
-        UnloadTexture(optionBackgroundTexture);
-        UnloadMusicStream(ambientMusic); 
-        locationService.Unload();
+        UnloadRenderTexture(target);
         CloseAudioDevice();
         CloseWindow();
     }

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj": {}
+    "C:\\Users\\User\\Documents\\GitHub\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj": {
+    "C:\\Users\\User\\Documents\\GitHub\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj",
+        "projectUniqueName": "C:\\Users\\User\\Documents\\GitHub\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj",
         "projectName": "Spirit_Of_Carpats_Remake",
-        "projectPath": "C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj",
-        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\Desktop\\it_steep\\c#\\Spirit_Of_Carpats_Remake\\obj\\",
+        "projectPath": "C:\\Users\\User\\Documents\\GitHub\\Spirit_Of_Carpats_Remake\\Spirit_Of_Carpats_Remake.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\Documents\\GitHub\\Spirit_Of_Carpats_Remake\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -69,6 +68,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.28, 8.0.28]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.28, 8.0.28]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.28, 8.0.28]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.28, 8.0.28]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"

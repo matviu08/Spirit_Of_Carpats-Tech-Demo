@@ -65,7 +65,7 @@ namespace Spirit_Of_Carpats_Remake.Graphics
 
         // Ambient — місячне нічне освітлення
         public float   AmbientLight     = 0.42f;
-        public Vector3 AmbientColor     = new Vector3(0.48f, 0.42f, 0.62f);
+        public Vector3 AmbientColor     = new Vector3(0.48f, 0.67f, 0.62f);
         public float   VignetteStrength = 0.48f;
 
         // Fog
